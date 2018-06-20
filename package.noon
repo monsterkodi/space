@@ -1,0 +1,24 @@
+name            space
+productName     space
+version         0.1.0
+description     disk size tool
+main            js/main.js
+repository
+                type  git
+                url   git+https://github.com/monsterkodi/space.git
+scripts
+                mac   bash ./bin/buildmac.sh
+                win   bash ./bin/buildwin.sh
+keywords
+                disksize
+                electron
+author          monsterkodi
+license         Unlicense
+bugs
+                url  https://github.com/monsterkodi/space/issues
+dependencies
+                kxk  https://github.com/monsterkodi/kxk.git
+devDependencies
+                electron        ^2.0.2
+                electron-packager  ^12.1.0
+                electron-rebuild  ^1.7.3
