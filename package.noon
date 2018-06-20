@@ -17,7 +17,10 @@ license         Unlicense
 bugs
                 url  https://github.com/monsterkodi/space/issues
 dependencies
-                kxk  https://github.com/monsterkodi/kxk.git
+                findit          ^2.0.0
+                findit2         ^2.2.3
+                kxk             https://github.com/monsterkodi/kxk.git
+                performance-now  ^2.1.0
 devDependencies
                 electron        ^2.0.2
                 electron-packager  ^12.1.0

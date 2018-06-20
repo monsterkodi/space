@@ -29,5 +29,22 @@ body
 #main
     display             flex
     flex-direction      column
+    transform           translateZ(0)
 
-    
+.status
+    font-family         titlebarFont
+    position            relative
+    left                0
+    right               0
+    top                 50%
+    transform           translateY(-50%)
+    text-align          center
+    // border              1px solid red
+    & .dir
+        font-size   larger // 32px
+    & .files
+    & .dirs
+        font-size   smaller // 23px
+    // & div
+        // border 1px solid blue
+        

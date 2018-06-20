@@ -16,10 +16,26 @@ w = new win
     pkg:    require '../package.json'
     menu:   '../coffee/menu.noon'
     icon:   '../img/menu@2x.png'
+   
+onStatus = (status) ->
     
-scanDir = (dir) ->
+    main =$ '#main'
+    main.innerHTML = ''
+    main.appendChild elem class:'status', children: [
+        elem class:'dir',   text: status.dir
+        elem class:'files', text: "#{status.files} files"
+        elem class:'dirs',  text: "#{status.dirs} directories"
+        elem class:'size',  text: "#{status.size} bytes"
+        elem class:'time',  text: "#{status.time} seconds #{status.state}"
+    ]
     
-    log 'scanDir', dir
+        # $('.dir').innerText   = "#{@dir}"
+        # $('.files').innerText = "#{@dirs[@dir].files} files"
+        # $('.dirs').innerText  = "#{Object.keys(@dirs).length} directories"
+        # $('.size').innerText  = "#{@dirs[@dir].size} bytes"
+        # $('.time').innerText  = "#{parseInt profile.delta('scan')/1000} seconds #{state}"
+    
+post.on 'status', onStatus
     
 #  0000000   00000000   00000000  000   000  
 # 000   000  000   000  000       0000  000  
@@ -35,7 +51,7 @@ openDir = ->
 
     electron.remote.dialog.showOpenDialog opts, (dirs) =>
         if dir = first dirs
-            scanDir dir
+            post.toMain 'scanDir', dir
     
 #  0000000   0000000   00     00  0000000     0000000   
 # 000       000   000  000   000  000   000  000   000  
@@ -72,18 +88,17 @@ document.body.addEventListener 'contextmenu', (event) ->
 # 000       000   000  000  0000     000             000  000   000     000
 # 000        0000000   000   000     000        0000000   000  0000000  00000000
 
-defaultFontSize = 15
+defaultFontSize = 44
 
 getFontSize = -> prefs.get 'fontSize', defaultFontSize
 
 setFontSize = (s) ->
         
     s = getFontSize() if not _.isFinite s
-    s = clamp 4, 44, s
+    s = clamp 8, 88, s
 
     prefs.set "fontSize", s
     $('#main').style.fontSize = "#{s}px"
-    iconSize = clamp 4, 44, parseInt s
 
 changeFontSize = (d) ->
     
@@ -108,11 +123,11 @@ resetFontSize = ->
 
 post.on 'menuAction', (action) ->
     
-    log 'menuAction', action
     switch action
         
         when 'Increase' then changeFontSize +1
         when 'Decrease' then changeFontSize -1
         when 'Reset'    then resetFontSize()
         when 'Open'     then openDir()
-        
+
+window.onload = -> setFontSize()
