@@ -9,7 +9,8 @@
 { post, win, tooltip, open, prefs, elem, setStyle, getStyle, pos, popup, first,
   valid, empty, childp, slash, clamp, udp, str, fs, error, log, $, _ } = require 'kxk'
 
-electron = require 'electron'
+electron    = require 'electron'
+prettybytes = require 'pretty-bytes'
 
 w = new win 
     dir:    __dirname
@@ -25,15 +26,9 @@ onStatus = (status) ->
         elem class:'dir',   text: status.dir
         elem class:'files', text: "#{status.files} files"
         elem class:'dirs',  text: "#{status.dirs} directories"
-        elem class:'size',  text: "#{status.size} bytes"
+        elem class:'size',  text: "#{prettybytes status.size}"
         elem class:'time',  text: "#{status.time} seconds #{status.state}"
     ]
-    
-        # $('.dir').innerText   = "#{@dir}"
-        # $('.files').innerText = "#{@dirs[@dir].files} files"
-        # $('.dirs').innerText  = "#{Object.keys(@dirs).length} directories"
-        # $('.size').innerText  = "#{@dirs[@dir].size} bytes"
-        # $('.time').innerText  = "#{parseInt profile.delta('scan')/1000} seconds #{state}"
     
 post.on 'status', onStatus
     
