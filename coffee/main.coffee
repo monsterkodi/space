@@ -8,6 +8,9 @@
 
 { post, args, udp, app, log } = require 'kxk'
 
+# electron = require 'electron'
+# electron.app.commandLine.appendSwitch '--disable-background-timer-throttling'
+
 new app
     dir:        __dirname
     pkg:        require '../package.json'
@@ -17,20 +20,3 @@ new app
     tray:       '../img/menu.png'
     about:      '../img/about.png'
     
-#  0000000   0000000   0000000   000   000  
-# 000       000       000   000  0000  000  
-# 0000000   000       000000000  000 0 000  
-#      000  000       000   000  000  0000  
-# 0000000    0000000  000   000  000   000  
-
-Scanner = require './scanner'    
-scanner = null
-scanDir = (dir) ->
-    
-    scanner?.stop()
-    scanner = new Scanner dir
-    
-post.on 'scanDir', scanDir
-
-# log 'scan...'
-# scanDir 'C:/Users/kodi/s/space'         

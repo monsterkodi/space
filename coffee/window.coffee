@@ -17,21 +17,7 @@ w = new win
     pkg:    require '../package.json'
     menu:   '../coffee/menu.noon'
     icon:   '../img/menu@2x.png'
-   
-onStatus = (status) ->
-    
-    main =$ '#main'
-    main.innerHTML = ''
-    main.appendChild elem class:'status', children: [
-        elem class:'dir',   text: status.dir
-        elem class:'files', text: "#{status.files} files"
-        elem class:'dirs',  text: "#{status.dirs} directories"
-        elem class:'size',  text: "#{prettybytes status.size}"
-        elem class:'time',  text: "#{status.time} seconds #{status.state}"
-    ]
-    
-post.on 'status', onStatus
-    
+           
 #  0000000   00000000   00000000  000   000  
 # 000   000  000   000  000       0000  000  
 # 000   000  00000000   0000000   000 0 000  
@@ -46,7 +32,39 @@ openDir = ->
 
     electron.remote.dialog.showOpenDialog opts, (dirs) =>
         if dir = first dirs
-            post.toMain 'scanDir', dir
+            scanDir slash.path dir
+    
+#  0000000   0000000   0000000   000   000  
+# 000       000       000   000  0000  000  
+# 0000000   000       000000000  000 0 000  
+#      000  000       000   000  000  0000  
+# 0000000    0000000  000   000  000   000  
+
+cp = null
+scanDir = (dir) ->            
+    log 'scanDir', dir
+    if cp
+        cp.kill()
+    cp = childp.fork slash.join(__dirname, 'scanner.js'), [dir], stdio: ['pipe', 'pipe', 'ignore', 'ipc'], execPath: 'node'
+    cp.on 'message', (msg) -> onStatus dir, msg
+
+onStatus = (dir, status) ->
+    
+    main =$ '#main'
+    
+    log status
+    
+    if status.time
+        div =$ '.status'
+        div.appendChild elem class:'time', text:status.time
+    else
+        main.innerHTML = ''
+        main.appendChild elem class:'status', children: [
+            elem class:'dir',   text: dir
+            elem class:'files', text: "#{status.files} files"
+            elem class:'dirs',  text: "#{status.dirs} folders"
+            elem class:'size',  text: status.short
+        ]
     
 #  0000000   0000000   00     00  0000000     0000000   
 # 000       000   000  000   000  000   000  000   000  
