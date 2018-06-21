@@ -32,12 +32,11 @@ body
     transform           translateZ(0)
 
 .folder
-    font-size           8px
-    overflow            hidden
     box-sizing          border-box
     display             flex
     &:hover
-        box-shadow      inset 0px 0px 0px 1px #ff0
+        box-shadow      inset 0px 0px 0px 1px #fff
+        padding         1px
     &.horz
         flex-direction  row
     &.vert
@@ -45,6 +44,7 @@ body
         
 .folder.top:hover
     border              none
+    padding             0
 
 #tooltip
     pointer-events          none
