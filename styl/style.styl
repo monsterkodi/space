@@ -31,6 +31,42 @@ body
     flex-direction      column
     transform           translateZ(0)
 
+.folder
+    font-size           8px
+    overflow            hidden
+    box-sizing          border-box
+    display             flex
+    &:hover
+        box-shadow      inset 0px 0px 0px 1px #ff0
+    &.horz
+        flex-direction  row
+    &.vert
+        flex-direction  column
+        
+.folder.top:hover
+    border              none
+
+#tooltip
+    pointer-events          none
+    display                 pre
+    font-family             titlebarFont
+    background              #222
+    padding-left            6px
+    padding-right           6px
+    padding-top             3px
+    border-radius           6px
+    font-size               18px
+    position                absolute
+    -webkit-user-select     none
+    transform               translate(-50%,-50%)
+    cursor                  default
+    
+//  0000000  000000000   0000000   000000000  000   000   0000000  
+// 000          000     000   000     000     000   000  000       
+// 0000000      000     000000000     000     000   000  0000000   
+//      000     000     000   000     000     000   000       000  
+// 0000000      000     000   000     000      0000000   0000000   
+
 .status
     font-family         titlebarFont
     position            relative

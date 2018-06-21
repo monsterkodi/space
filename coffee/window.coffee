@@ -11,13 +11,16 @@
 
 electron    = require 'electron'
 prettybytes = require 'pretty-bytes'
+render      = require './render'
 
 w = new win 
     dir:    __dirname
     pkg:    require '../package.json'
     menu:   '../coffee/menu.noon'
     icon:   '../img/menu@2x.png'
-           
+    
+main =$ '#main'    
+
 #  0000000   00000000   00000000  000   000  
 # 000   000  000   000  000       0000  000  
 # 000   000  00000000   0000000   000 0 000  
@@ -49,14 +52,11 @@ scanDir = (dir) ->
     cp.on 'message', (msg) -> onStatus dir, msg
 
 onStatus = (dir, status) ->
-    
-    main =$ '#main'
-    
-    log status
-    
+        
     if status.time
         div =$ '.status'
         div.appendChild elem class:'time', text:status.time
+        render status.file, status
     else
         main.innerHTML = ''
         main.appendChild elem class:'status', children: [
@@ -86,7 +86,7 @@ document.body.addEventListener 'contextmenu', (event) ->
     
     absPos = pos event
     if not absPos?
-        absPos = pos $("#main").getBoundingClientRect().left, $("#main").getBoundingClientRect().top
+        absPos = pos main.getBoundingClientRect().left, main.getBoundingClientRect().top
        
     items = _.clone window.titlebar.menuTemplate()
         
@@ -111,7 +111,7 @@ setFontSize = (s) ->
     s = clamp 8, 88, s
 
     prefs.set "fontSize", s
-    $('#main').style.fontSize = "#{s}px"
+    main.style.fontSize = "#{s}px"
 
 changeFontSize = (d) ->
     
@@ -143,4 +143,30 @@ post.on 'menuAction', (action) ->
         when 'Reset'    then resetFontSize()
         when 'Open'     then openDir()
 
-window.onload = -> setFontSize()
+tooltip = null
+onEnter = (event) -> 
+
+    obj = event.target.obj
+    return if empty obj
+    path = obj.name
+    p = obj
+    while p = p.parent
+        path = p.name + '/' + path
+    
+    tooltip?.remove()
+    tooltip = elem id:'tooltip', class:'tooltip', html:"#{obj.name}<br>#{path}<br>#{prettybytes obj.size}"
+    event.target.appendChild tooltip
+    br = event.target.getBoundingClientRect()
+    tooltip.style.left = "#{br.left+br.width/2}px"
+    tooltip.style.top = "#{br.top+br.height/2-30}px"
+        
+window.onload = -> 
+    
+    setFontSize()
+    
+    scanFile = slash.join __dirname, '..', 'scan.json'
+    if slash.isFile scanFile
+        render scanFile
+        
+    main.addEventListener 'mouseover', onEnter
+        
