@@ -58,8 +58,9 @@ onStatus = (dir, status) ->
         div.appendChild elem class:'time', text:status.time
         render status.file, status
     else
-        main.innerHTML = ''
-        main.appendChild elem class:'status', children: [
+        space =$ '#space'
+        space.innerHTML = ''
+        space.appendChild elem class:'status', children: [
             elem class:'dir',   text: dir
             elem class:'files', text: "#{status.files} files"
             elem class:'dirs',  text: "#{status.dirs} folders"

@@ -1,6 +1,7 @@
 node_modules
 Icon?
 package.json
+./*.json
 bin/*.json
 *.dmg
 *-x64
