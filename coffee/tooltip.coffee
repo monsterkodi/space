@@ -6,7 +6,7 @@
    000      0000000    0000000   0000000     000     000  000      
 ###
 
-{ slash, elem, pos, log, $, _ } = require 'kxk'
+{ post, slash, elem, pos, log, $, _ } = require 'kxk'
 
 prettybytes = require 'pretty-bytes'
 
@@ -18,14 +18,31 @@ class Tooltip
             elem class:'name'
             elem class:'path'
             elem class:'size'
-            elem class:'depth'
+            # elem class:'depth'
             ]
         
         main =$ "#main"
         main.appendChild @div
+        
+        post.on 'tooltip', (msg) => 
+            switch msg 
+                when 'clear' then @clear()
+                when 'show'  then @show()
+    
+    show: -> @div.style.display = 'initial'
+    hide: -> @div.style.display = 'none'
+        
+    clear: -> 
+        
+        @hide()
+        $('.name',  @div).innerHTML = ''
+        $('.path',  @div).innerHTML = ''
+        $('.size',  @div).innerHTML = ''
+        # $('.depth', @div).innerHTML = ''
     
     showObject: (obj) ->
         
+        @show()
         paths = []
         p = obj
         while p = p.parent
@@ -35,7 +52,7 @@ class Tooltip
         $('.name',  @div).innerText = obj.name 
         $('.path',  @div).innerText = path
         $('.size',  @div).innerText = prettybytes obj.size
-        $('.depth', @div).innerText = obj.depth
+        # $('.depth', @div).innerText = obj.depth
         
     position: (event) ->
         

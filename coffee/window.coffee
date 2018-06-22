@@ -9,17 +9,23 @@
 { post, win, open, prefs, elem, setStyle, getStyle, pos, popup, first,
   valid, empty, childp, slash, clamp, udp, str, fs, error, log, $, _ } = require 'kxk'
 
-electron    = require 'electron'
-render      = require './render'
-Tooltip     = require './tooltip'
+electron = require 'electron'
+Tooltip  = require './tooltip'
+Stack    = require './stack'
 
 w = new win 
-    dir:    __dirname
-    pkg:    require '../package.json'
-    menu:   '../coffee/menu.noon'
-    icon:   '../img/menu@2x.png'
+    dir:     __dirname
+    pkg:     require '../package.json'
+    menu:    '../coffee/menu.noon'
+    icon:    '../img/menu@2x.png'
+    context: (items) -> onContext items
     
-main =$ '#main'    
+main  =$ '#main'    
+space =$ '#space'    
+
+stack   = new Stack()
+tooltip = null
+active  = null
 
 #  0000000   00000000   00000000  000   000  
 # 000   000  000   000  000       0000  000  
@@ -33,39 +39,9 @@ openDir = ->
         title:      'Open'
         properties: ['openDirectory']
 
-    electron.remote.dialog.showOpenDialog opts, (dirs) =>
+    electron.remote.dialog.showOpenDialog opts, (dirs) ->
         if dir = first dirs
-            scanDir slash.path dir
-    
-#  0000000   0000000   0000000   000   000  
-# 000       000       000   000  0000  000  
-# 0000000   000       000000000  000 0 000  
-#      000  000       000   000  000  0000  
-# 0000000    0000000  000   000  000   000  
-
-cp = null
-scanDir = (dir) ->            
-    log 'scanDir', dir
-    if cp
-        cp.kill()
-    cp = childp.fork slash.join(__dirname, 'scanner.js'), [dir], stdio: ['pipe', 'pipe', 'ignore', 'ipc'], execPath: 'node'
-    cp.on 'message', (msg) -> onStatus dir, msg
-
-onStatus = (dir, status) ->
-        
-    if status.time
-        div =$ '.status'
-        div.appendChild elem class:'time', text:status.time
-        render status.file, status
-    else
-        space =$ '#space'
-        space.innerHTML = ''
-        space.appendChild elem class:'status', children: [
-            elem class:'dir',   text: dir
-            elem class:'files', text: "#{status.files} files"
-            elem class:'dirs',  text: "#{status.dirs} folders"
-            elem class:'size',  text: status.short
-        ]
+            stack.scanDir slash.path dir
     
 #  0000000   0000000   00     00  0000000     0000000   
 # 000       000   000  000   000  000   000  000   000  
@@ -73,28 +49,30 @@ onStatus = (dir, status) ->
 # 000       000   000  000 0 000  000   000  000   000  
 #  0000000   0000000   000   000  0000000     0000000   
 
-post.on 'combo', (combo, info) -> log 'combo', combo
+post.on 'combo', (combo, info) -> 
 
-    #  0000000   0000000   000   000  000000000  00000000  000   000  000000000  
-    # 000       000   000  0000  000     000     000        000 000      000     
-    # 000       000   000  000 0 000     000     0000000     00000       000     
-    # 000       000   000  000  0000     000     000        000 000      000     
-    #  0000000   0000000   000   000     000     00000000  000   000     000     
-    
-document.body.removeEventListener 'contextmenu', w.onContextMenu
+    switch combo
+        when 'esc' then stack.goUp()
+        else log 'combo', combo
 
-document.body.addEventListener 'contextmenu', (event) ->
+#  0000000   0000000   000   000  000000000  00000000  000   000  000000000  
+# 000       000   000  0000  000     000     000        000 000      000     
+# 000       000   000  000 0 000     000     0000000     00000       000     
+# 000       000   000  000  0000     000     000        000 000      000     
+#  0000000   0000000   000   000     000     00000000  000   000     000     
     
-    absPos = pos event
-    if not absPos?
-        absPos = pos main.getBoundingClientRect().left, main.getBoundingClientRect().top
-       
-    items = _.clone window.titlebar.menuTemplate()
-        
-    popup.menu
-        items:  items
-        x:      absPos.x
-        y:      absPos.y
+onContext = (items) ->
+    [    
+         text:'Up',   accel:'esc'
+    ,
+         text:'Open', accel:'ctrl+o'
+    ].concat items
+    
+post.on 'popup', (msg) -> 
+    
+    switch msg 
+        when 'opened' then tooltip.hide()
+        when 'closed' then tooltip.show()
 
 # 00000000   0000000   000   000  000000000      0000000  000  0000000  00000000
 # 000       000   000  0000  000     000        000       000     000   000
@@ -143,9 +121,8 @@ post.on 'menuAction', (action) ->
         when 'Decrease' then changeFontSize -1
         when 'Reset'    then resetFontSize()
         when 'Open'     then openDir()
+        when 'Up'       then stack.goUp()
 
-tooltip = null
-active  = null
 onEnter = (event) -> 
 
     obj = event.target.obj
@@ -159,9 +136,18 @@ onEnter = (event) ->
     tooltip.position event
       
 onMove = (event) -> tooltip.position event
-onDown = (event) -> 
+
+# 0000000     0000000   000   000  000   000  
+# 000   000  000   000  000 0 000  0000  000  
+# 000   000  000   000  000000000  000 0 000  
+# 000   000  000   000  000   000  000  0000  
+# 0000000     0000000   00     00  000   000  
+
+onClick = (event) -> 
     
-    log 'onDown', event.target.obj.name
+    if event.button == 0
+        if obj = event.target.obj
+            stack.goDown obj
             
 window.onload = -> 
     
@@ -171,9 +157,9 @@ window.onload = ->
     
     scanFile = slash.join __dirname, '..', 'scan.json'
     if slash.isFile scanFile
-        render scanFile
+        stack.loadFile scanFile
         
     main.addEventListener 'mouseover', onEnter
     main.addEventListener 'mousemove', onMove
-    main.addEventListener 'mousedown', onDown
+    main.addEventListener 'click',     onClick
         
