@@ -23,9 +23,13 @@ renderObj = (obj, div, depth=0, dir='vert') ->
     
     return objDiv if empty obj.children
     
+    return objDiv if obj.accum < 0.000005
+    
     for child in obj.children
         child.parent = obj
         child.scale = child.size / obj.size
+        child.accum = child.scale * obj.accum
+
         renderObj child, objDiv, depth+1, if dir == 'vert' then 'horz' else 'vert'
         
     objDiv
@@ -42,11 +46,12 @@ render = (file, status) ->
         
         obj = JSON.parse data
         obj.scale = 1
+        obj.accum = 1
         
-        main =$ '#main' 
-        main.innerHTML = ''
+        space =$ '#space' 
+        space.innerHTML = ''
         
-        div = renderObj obj, main
+        div = renderObj obj, space
         div.classList.add 'top'
         
 module.exports = render

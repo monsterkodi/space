@@ -26,7 +26,12 @@ body
 // 000 0 000  000   000  000  000  0000  
 // 000   000  000   000  000  000   000  
 
-#main
+#space
+    position            absolute
+    top 0
+    left 0
+    bottom 0
+    right 0
     display             flex
     flex-direction      column
     transform           translateZ(0)
@@ -34,18 +39,13 @@ body
 .folder
     box-sizing          border-box
     display             flex
-    &:hover
+    &.bordered
         box-shadow      inset 0px 0px 0px 1px #fff
-        padding         1px
     &.horz
         flex-direction  row
     &.vert
         flex-direction  column
         
-.folder.top:hover
-    border              none
-    padding             0
-
 #tooltip
     pointer-events          none
     display                 pre
@@ -58,8 +58,11 @@ body
     font-size               18px
     position                absolute
     -webkit-user-select     none
-    transform               translate(-50%,-50%)
     cursor                  default
+    & .name
+        font-size           24px
+    & .path
+        font-size           12px
     
 //  0000000  000000000   0000000   000000000  000   000   0000000  
 // 000          000     000   000     000     000   000  000       

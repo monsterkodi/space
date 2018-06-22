@@ -6,12 +6,12 @@
 00     00  000  000   000  0000000     0000000   00     00  
 ###
 
-{ post, win, tooltip, open, prefs, elem, setStyle, getStyle, pos, popup, first,
+{ post, win, open, prefs, elem, setStyle, getStyle, pos, popup, first,
   valid, empty, childp, slash, clamp, udp, str, fs, error, log, $, _ } = require 'kxk'
 
 electron    = require 'electron'
-prettybytes = require 'pretty-bytes'
 render      = require './render'
+Tooltip     = require './tooltip'
 
 w = new win 
     dir:    __dirname
@@ -144,29 +144,35 @@ post.on 'menuAction', (action) ->
         when 'Open'     then openDir()
 
 tooltip = null
+active  = null
 onEnter = (event) -> 
 
     obj = event.target.obj
     return if empty obj
-    path = obj.name
-    p = obj
-    while p = p.parent
-        path = p.name + '/' + path
     
-    tooltip?.remove()
-    tooltip = elem id:'tooltip', class:'tooltip', html:"#{obj.name}<br>#{path}<br>#{prettybytes obj.size}"
-    event.target.appendChild tooltip
-    br = event.target.getBoundingClientRect()
-    tooltip.style.left = "#{br.left+br.width/2}px"
-    tooltip.style.top = "#{br.top+br.height/2-30}px"
+    active?.classList.remove 'bordered'
+    active = event.target
+    active.classList.add 'bordered'
         
+    tooltip.showObject obj
+    tooltip.position event
+      
+onMove = (event) -> tooltip.position event
+onDown = (event) -> 
+    
+    log 'onDown', event.target.obj.name
+            
 window.onload = -> 
     
     setFontSize()
+    
+    tooltip = new Tooltip()
     
     scanFile = slash.join __dirname, '..', 'scan.json'
     if slash.isFile scanFile
         render scanFile
         
     main.addEventListener 'mouseover', onEnter
+    main.addEventListener 'mousemove', onMove
+    main.addEventListener 'mousedown', onDown
         
