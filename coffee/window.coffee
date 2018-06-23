@@ -41,7 +41,18 @@ openDir = ->
     electron.remote.dialog.showOpenDialog opts, (dirs) ->
         if dir = first dirs
             stack.scanDir slash.path dir
-    
+            
+# 00000000  000   000  00000000   000       0000000   00000000   00000000  
+# 000        000 000   000   000  000      000   000  000   000  000       
+# 0000000     00000    00000000   000      000   000  0000000    0000000   
+# 000        000 000   000        000      000   000  000   000  000       
+# 00000000  000   000  000        0000000   0000000   000   000  00000000  
+
+explore     = -> open slash.unslash slash.untilde tooltip.objPath tooltip.obj
+exploreRoot = -> 
+    log 'exploreRoot', slash.unslash slash.untilde tooltip.objPath stack.obj
+    open slash.unslash slash.untilde tooltip.objPath stack.obj
+            
 #  0000000   0000000   00     00  0000000     0000000   
 # 000       000   000  000   000  000   000  000   000  
 # 000       000   000  000000000  0000000    000   000  
@@ -51,6 +62,8 @@ openDir = ->
 post.on 'combo', (combo, info) -> 
 
     switch combo
+        when 'r'   then exploreRoot()
+        when 'e'   then explore()
         when 'esc' then stack.goUp()
         else log 'combo', combo
 
@@ -64,7 +77,13 @@ onContext = (items) ->
     [    
          text:'Up',   accel:'esc'
     ,
-         text:'Open', accel:'ctrl+o'
+         text: ''
+    ,
+         text:'Explore', accel:'e'
+    ,
+         text:'Explore Root', accel:'r'
+    ,
+         text: ''
     ].concat items
     
 post.on 'popup', (msg) -> 
@@ -116,11 +135,13 @@ post.on 'menuAction', (action) ->
     
     switch action
         
-        when 'Increase' then changeFontSize +1
-        when 'Decrease' then changeFontSize -1
-        when 'Reset'    then resetFontSize()
-        when 'Open'     then openDir()
-        when 'Up'       then stack.goUp()
+        when 'Increase'      then changeFontSize +1
+        when 'Decrease'      then changeFontSize -1
+        when 'Reset'         then resetFontSize()
+        when 'Explore'       then explore()
+        when 'Explore Root'  then exploreRoot()
+        when 'Open'          then openDir()
+        when 'Up'            then stack.goUp()
 
 onMouseEnter = (event) -> tooltip.showObject event
 onMouseMove  = (event) -> tooltip.position   event

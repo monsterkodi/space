@@ -81,7 +81,7 @@ class Stack
     #      000  000       000   000  000  0000  
     # 0000000    0000000  000   000  000   000  
     
-    scanDir: (@dir) ->    
+    scanDir: (@dir) ->
         
         @cp?.kill()
         @cp = childp.fork slash.join(__dirname, 'scanner.js'), [@dir], stdio: ['pipe', 'pipe', 'ignore', 'ipc'], execPath: 'node'

@@ -14,6 +14,7 @@ class Tooltip
 
     constructor: ->
 
+        @obj = null
         @div = elem id:'tooltip', children:[
             elem class:'names', children: [
                     elem class:'name base'
@@ -81,6 +82,8 @@ class Tooltip
         
         obj = target.obj
         return if empty obj
+        
+        @obj = obj
         
         br = target.getBoundingClientRect()
 
