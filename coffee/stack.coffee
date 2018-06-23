@@ -89,7 +89,7 @@ class Stack
     
     onStatus: (status) =>
             
-        log 'status', status
+        # log 'status', status
         if status.time
             div =$ '.status'
             div.appendChild elem class:'time', text:status.time

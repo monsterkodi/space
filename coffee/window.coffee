@@ -40,6 +40,7 @@ openDir = ->
 
     electron.remote.dialog.showOpenDialog opts, (dirs) ->
         if dir = first dirs
+            space.innerHTML = ''
             stack.scanDir slash.path dir
             
 # 00000000  000   000  00000000   000       0000000   00000000   00000000  
@@ -141,6 +142,7 @@ post.on 'menuAction', (action) ->
         when 'Explore'       then explore()
         when 'Explore Root'  then exploreRoot()
         when 'Open'          then openDir()
+        when 'Rescan'        then stack.scanDir tooltip.objPath stack.obj
         when 'Up'            then stack.goUp()
 
 onMouseEnter = (event) -> tooltip.showObject event
