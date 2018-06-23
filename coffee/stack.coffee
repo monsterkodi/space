@@ -47,6 +47,7 @@ class Stack
     
         # post.emit 'tooltip', 'clear'
         @path = @objPath @obj
+        log "Stack.render #{@path}"
         
         @title?.remove()
         @title = elem class:'stackobj', text:@path

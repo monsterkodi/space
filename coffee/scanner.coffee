@@ -6,8 +6,9 @@
 0000000    0000000  000   000  000   000  000   000  00000000  000   000
 ###
 
-{ post, slash, walkdir, elem, empty, valid, fs, error, log, $, _ } = require 'kxk'
+{ post, slash, walkdir, elem, empty, valid, fs, $, _ } = require 'kxk'
 
+log         = console.log
 profile     = require './profile'
 prettybytes = require 'pretty-bytes'
 prettytime  = require 'pretty-ms'
@@ -30,6 +31,7 @@ class Scanner
             @walker.on 'path', @onPath            
             @walker.on 'end',  @onEnd               
             @walker.on 'stop', @onEnd               
+            @walker.on 'error', ->
                 
         catch err
             error "Walker.start -- #{err} dir: #{dir} stack:", err.stack
@@ -69,9 +71,9 @@ class Scanner
     #  0000000   000   000        000        000   000     000     000   000  
     
     onPath: (p,stat) =>
-        # log 'p', typeof(p), p.length, stat.isDirectory(), stat.isFile()
-        # log "s #{p.length} #{p}"
+
         p = slash.path p
+        
         if stat.isDirectory()
             @newDir p 
         else if stat.isFile()
@@ -99,22 +101,24 @@ class Scanner
                 @addFile file, size, parent
 
     onEnd: =>
-        log 'end'
-        @status ''
+        
+        @status 'end'
 
         @dirs[@dir].dir = @dir
         
         json = JSON.stringify @dirs[@dir], null, 1
         file = slash.join process.cwd(), 'scan.json'
         
+        # log "write #{file}"
+        
         fs.writeFile file, json, (err) =>
+            log "wrote #{file}"
             if valid err
                 error err 
                 @send error:err.stack
             else
                 time = prettytime parseInt profile.delta 'scan'
                 @send file:file, time:time, size:json.length
-            log.stop()
             
         @walker = null
                 
@@ -134,7 +138,7 @@ class Scanner
         if _.isFunction process.send
             process.send obj
         else
-            console.log JSON.stringify obj, null, 1
+            log JSON.stringify obj #, null, 1
         
 if not empty process.argv[2]
     dir = process.argv[2]
@@ -142,8 +146,6 @@ else
     dir = process.cwd()
 
 process.on 'uncaughtException', (err) ->
-    # srcmap = require './srcmap'    
-    # srcmap.logErr err, '🔻'
     log 'scanner error', err.stack
     true
     

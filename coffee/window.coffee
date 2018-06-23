@@ -41,6 +41,7 @@ openDir = ->
     electron.remote.dialog.showOpenDialog opts, (dirs) ->
         if dir = first dirs
             space.innerHTML = ''
+            tooltip.hide()
             stack.scanDir slash.path dir
             
 # 00000000  000   000  00000000   000       0000000   00000000   00000000  
