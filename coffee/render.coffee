@@ -38,9 +38,8 @@ render = (obj, div, depth=0, direction='vert') ->
     
     div.appendChild objDiv
     
-    return objDiv if empty obj.children
-    
-    return objDiv if obj.accum < 0.000005
+    return if empty obj.children
+    return if obj.accum < 0.000005
     
     for child in obj.children
         child.parent = obj
@@ -49,6 +48,4 @@ render = (obj, div, depth=0, direction='vert') ->
 
         render child, objDiv, depth+1, if obj.direction == 'horz' then 'vert' else 'horz'
         
-    objDiv
-      
 module.exports = render

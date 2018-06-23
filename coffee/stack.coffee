@@ -45,13 +45,15 @@ class Stack
             
     render: (@obj) -> 
     
-        post.emit 'tooltip', 'show'
+        # post.emit 'tooltip', 'clear'
         @path = @objPath @obj
+        
         @title?.remove()
         @title = elem class:'stackobj', text:@path
         titlebar =$ '#titlebar'
         titlebar.insertBefore @title, $ '.minimize'
         render @obj, $ '#space'
+        post.emit 'tooltip', 'show'
     
     # 000       0000000    0000000   0000000        00000000  000  000      00000000  
     # 000      000   000  000   000  000   000      000       000  000      000       
@@ -71,8 +73,7 @@ class Stack
             
             @root = JSON.parse data
             
-            div = @render @root
-            div.classList.add 'top'
+            @render @root
             
     #  0000000   0000000   0000000   000   000  
     # 000       000       000   000  0000  000  
@@ -88,6 +89,7 @@ class Stack
     
     onStatus: (status) =>
             
+        log 'status', status
         if status.time
             div =$ '.status'
             div.appendChild elem class:'time', text:status.time

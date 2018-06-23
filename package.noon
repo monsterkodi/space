@@ -1,6 +1,6 @@
 name            space
 productName     space
-version         0.6.0
+version         0.7.0
 description     disk size tool
 main            js/main.js
 repository

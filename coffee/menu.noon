@@ -39,6 +39,7 @@ Window
     Minimize                alt+ctrl+shift+m
     Maximize                alt+ctrl+m
     ---
+    Screenshot              f3
     Reload                  alt+ctrl+l
     DevTools                alt+ctrl+i
 

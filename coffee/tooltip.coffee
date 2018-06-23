@@ -61,6 +61,9 @@ class Tooltip
         $('.path',          @div).innerHTML = ''
         $('.base.size',     @div).innerHTML = ''
         $('.active.size',   @div).innerHTML = ''
+        
+        @rect.style.width = '0'
+        @base.style.width = '0'
     
     objPath: (obj) ->
         
@@ -71,10 +74,15 @@ class Tooltip
         
     showObject: (event) ->
         
-        obj = event.target.obj
+        x = event.clientX 
+        y = event.clientY
+        
+        target = document.elementFromPoint x, y
+        
+        obj = target.obj
         return if empty obj
         
-        br = event.target.getBoundingClientRect()
+        br = target.getBoundingClientRect()
 
         space =$ '#space'
         sr = space.getBoundingClientRect()
@@ -84,7 +92,7 @@ class Tooltip
         @rect.style.width  = "#{br.width}px"
         @rect.style.height = "#{br.height}px"
         
-        base = event.target
+        base = target
         while base.parentNode != space and base.parentNode.parentNode != space
             base = base.parentNode
             
@@ -99,6 +107,8 @@ class Tooltip
         $('.path',          @div).innerText = @objPath obj
         $('.base.size',     @div).innerText = prettybytes base.obj.size
         $('.active.size',   @div).innerText = prettybytes obj.size
+        
+        @position event
         
     position: (event) ->
         

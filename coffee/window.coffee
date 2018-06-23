@@ -122,19 +122,8 @@ post.on 'menuAction', (action) ->
         when 'Open'     then openDir()
         when 'Up'       then stack.goUp()
 
-onMouseEnter = (event) -> 
-
-    # obj = event.target.obj
-    # return if empty obj
-    
-    # active?.classList.remove 'bordered'
-    # active = event.target
-    # active.classList.add 'bordered'
-        
-    tooltip.showObject event#, obj
-    # tooltip.position event
-      
-onMouseMove = (event) -> tooltip.position event
+onMouseEnter = (event) -> tooltip.showObject event
+onMouseMove  = (event) -> tooltip.position   event
 
 # 0000000     0000000   000   000  000   000  
 # 000   000  000   000  000 0 000  0000  000  
@@ -142,14 +131,16 @@ onMouseMove = (event) -> tooltip.position event
 # 000   000  000   000  000   000  000  0000  
 # 0000000     0000000   00     00  000   000  
 
-onClick = (event) -> 
-    if event.button == 0
-        if obj = event.target.obj
-            stack.goDown obj
-            
 onMouseDown = (event) ->
-    if event.button == 1
-        post.emit 'menuAction', 'Up'
+    
+    switch event.button
+        when 0
+            if obj = event.target.obj
+                stack.goDown obj
+        when 1
+            post.emit 'menuAction', 'Up'
+            
+    onMouseEnter event
             
 window.onload = -> 
     
@@ -163,6 +154,5 @@ window.onload = ->
         
     main.addEventListener 'mouseover', onMouseEnter
     main.addEventListener 'mousemove', onMouseMove
-    main.addEventListener 'mousedown', onMouseDown
-    main.addEventListener 'click',     onClick
+    main.addEventListener 'mouseup', onMouseDown
         

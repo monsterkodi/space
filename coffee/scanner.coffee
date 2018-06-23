@@ -28,8 +28,8 @@ class Scanner
             @walker = findit @dir, no_recurse:false, track_inodes:false
                                 
             @walker.on 'path', @onPath            
-            @walker.on 'end', @onEnd               
-            @walker.on 'error', (err) -> console.log 'error', err
+            @walker.on 'end',  @onEnd               
+            @walker.on 'stop', @onEnd               
                 
         catch err
             error "Walker.start -- #{err} dir: #{dir} stack:", err.stack
@@ -59,7 +59,7 @@ class Scanner
             dirs:   Object.keys(@dirs).length
             size:   @dirs[@dir].size
             short:  prettybytes @dirs[@dir].size
-                    
+          
         @send info
         
     #  0000000   000   000        00000000    0000000   000000000  000   000  
@@ -69,11 +69,12 @@ class Scanner
     #  0000000   000   000        000        000   000     000     000   000  
     
     onPath: (p,stat) =>
-        
+        # log 'p', typeof(p), p.length, stat.isDirectory(), stat.isFile()
+        # log "s #{p.length} #{p}"
         p = slash.path p
         if stat.isDirectory()
             @newDir p 
-        else
+        else if stat.isFile()
             @addFile p, stat.size, slash.dir(p)
             
         if profile.delta('dir') > 300
@@ -98,7 +99,7 @@ class Scanner
                 @addFile file, size, parent
 
     onEnd: =>
-        
+        log 'end'
         @status ''
 
         @dirs[@dir].dir = @dir
@@ -140,5 +141,11 @@ if not empty process.argv[2]
 else
     dir = process.cwd()
 
+process.on 'uncaughtException', (err) ->
+    # srcmap = require './srcmap'    
+    # srcmap.logErr err, '🔻'
+    log 'scanner error', err.stack
+    true
+    
 new Scanner slash.resolve dir
     
