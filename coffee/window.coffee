@@ -123,7 +123,7 @@ post.on 'menuAction', (action) ->
         when 'Open'     then openDir()
         when 'Up'       then stack.goUp()
 
-onEnter = (event) -> 
+onMouseEnter = (event) -> 
 
     obj = event.target.obj
     return if empty obj
@@ -135,7 +135,7 @@ onEnter = (event) ->
     tooltip.showObject obj
     tooltip.position event
       
-onMove = (event) -> tooltip.position event
+onMouseMove = (event) -> tooltip.position event
 
 # 0000000     0000000   000   000  000   000  
 # 000   000  000   000  000 0 000  0000  000  
@@ -144,10 +144,13 @@ onMove = (event) -> tooltip.position event
 # 0000000     0000000   00     00  000   000  
 
 onClick = (event) -> 
-    
     if event.button == 0
         if obj = event.target.obj
             stack.goDown obj
+            
+onMouseDown = (event) ->
+    if event.button == 1
+        post.emit 'menuAction', 'Up'
             
 window.onload = -> 
     
@@ -159,7 +162,8 @@ window.onload = ->
     if slash.isFile scanFile
         stack.loadFile scanFile
         
-    main.addEventListener 'mouseover', onEnter
-    main.addEventListener 'mousemove', onMove
+    main.addEventListener 'mouseover', onMouseEnter
+    main.addEventListener 'mousemove', onMouseMove
+    main.addEventListener 'mousedown', onMouseDown
     main.addEventListener 'click',     onClick
         

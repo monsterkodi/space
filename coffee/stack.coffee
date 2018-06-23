@@ -18,15 +18,14 @@ class Stack
         @cp    = null
         @obj   = null
         @root  = null
+        @title = null
+        @path  = ''
         @stack = []
 
     goUp: -> 
         
         return if empty @stack
-        
-        @obj = @stack.pop()
-        log 'goUp', @obj.name
-        @render()
+        @render @stack.pop()
         
     goDown: (obj) ->
         
@@ -34,12 +33,25 @@ class Stack
             obj = obj.parent
             
         if obj.parent == @obj
-            log 'goDown', obj.name
             @stack.push @obj
-            @obj = obj
-            @render()
+            @render obj
+    
+    objPath: (obj) ->
         
-    render: -> render @obj, $ '#space'
+        path = [obj.dir ? obj.name]
+        while obj = obj.parent
+            path.unshift obj.dir ? obj.name
+        slash.tilde path.join '/'
+            
+    render: (@obj) -> 
+    
+        post.emit 'tooltip', 'show'
+        @path = @objPath @obj
+        @title?.remove()
+        @title = elem class:'stackobj', text:@path
+        titlebar =$ '#titlebar'
+        titlebar.insertBefore @title, $ '.minimize'
+        render @obj, $ '#space'
     
     # 000       0000000    0000000   0000000        00000000  000  000      00000000  
     # 000      000   000  000   000  000   000      000       000  000      000       
@@ -57,11 +69,9 @@ class Stack
                 if data.length != status.size
                     log "got #{data.length} bytes of data, expected #{status.size}"
             
-            @obj  = JSON.parse data
+            @root = JSON.parse data
             
-            @root = @obj
-                    
-            div = @render()
+            div = @render @root
             div.classList.add 'top'
             
     #  0000000   0000000   0000000   000   000  

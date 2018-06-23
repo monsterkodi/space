@@ -18,7 +18,6 @@ class Tooltip
             elem class:'name'
             elem class:'path'
             elem class:'size'
-            # elem class:'depth'
             ]
         
         main =$ "#main"
@@ -38,11 +37,9 @@ class Tooltip
         $('.name',  @div).innerHTML = ''
         $('.path',  @div).innerHTML = ''
         $('.size',  @div).innerHTML = ''
-        # $('.depth', @div).innerHTML = ''
     
     showObject: (obj) ->
         
-        @show()
         paths = []
         p = obj
         while p = p.parent
@@ -52,7 +49,6 @@ class Tooltip
         $('.name',  @div).innerText = obj.name 
         $('.path',  @div).innerText = path
         $('.size',  @div).innerText = prettybytes obj.size
-        # $('.depth', @div).innerText = obj.depth
         
     position: (event) ->
         
@@ -64,12 +60,13 @@ class Tooltip
         br = @div.getBoundingClientRect()
         
         xoff = 20
+        yoff = 40
         
         if left+br.width+xoff > document.body.clientWidth 
             left = document.body.clientWidth - br.width - xoff
            
-        if top+br.height > document.body.clientHeight
-            top = document.body.clientHeight - br.height
+        if top+br.height+yoff > document.body.clientHeight
+            top = absPos.y - br.height - yoff
         
         @div.style.left = "#{left}px"
         @div.style.top  = "#{top}px"
