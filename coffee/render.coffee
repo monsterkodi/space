@@ -25,13 +25,14 @@ render = (obj, div, depth=0, direction='vert') ->
         g = 32
         b = 32
     
-    r = clamp 0, 255, r + randInt(16)-8
-    b = clamp 0, 255, b + randInt(16)-8
-    a = 1
-    
     obj.direction ?= direction
     
-    objDiv = elem class:"folder #{obj.direction}", style:"flex: 0 0 #{obj.scale*100}%; background-color:rgba(#{r}, #{g}, #{b}, #{a});"
+    brcol = "rgb(#{Math.max 0, parseInt r/2}, #{Math.max 0, parseInt g/2}, #{Math.max 0, parseInt b/2})"
+    tlcol = "rgb(#{r}, #{g}, #{b})"
+    objDiv = elem 
+        class:"folder #{obj.direction}"
+        style:"flex: 0 0 #{obj.scale*100}%; background:linear-gradient(to bottom right, #{tlcol}, #{brcol});"
+
     obj.depth = depth
     objDiv.obj = obj
     

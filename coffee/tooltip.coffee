@@ -6,7 +6,7 @@
    000      0000000    0000000   0000000     000     000  000      
 ###
 
-{ post, slash, elem, pos, log, $, _ } = require 'kxk'
+{ post, slash, empty, elem, pos, log, $, _ } = require 'kxk'
 
 prettybytes = require 'pretty-bytes'
 
@@ -14,13 +14,28 @@ class Tooltip
 
     constructor: ->
 
-        @div = elem id:'tooltip', class:'tooltip', children:[
-            elem class:'name'
+        @div = elem id:'tooltip', children:[
+            elem class:'names', children: [
+                    elem class:'name base'
+                ,
+                    elem class:'name active'
+                ]
             elem class:'path'
-            elem class:'size'
+            elem class:'sizes', children: [
+                    elem class:'size base'
+                ,
+                    elem class:'size active'
+                ]
             ]
         
         main =$ "#main"
+
+        @base = elem id:'base', class:'rect'
+        main.appendChild @base
+        
+        @rect = elem id:'active', class:'rect'
+        main.appendChild @rect
+        
         main.appendChild @div
         
         post.on 'tooltip', (msg) => 
@@ -28,27 +43,62 @@ class Tooltip
                 when 'clear' then @clear()
                 when 'show'  then @show()
     
-    show: -> @div.style.display = 'initial'
-    hide: -> @div.style.display = 'none'
+    show: -> 
+        @div.style.display = 'initial'
+        @rect.style.display = 'initial'
+        @base.style.display = 'initial'
+        
+    hide: -> 
+        @div.style.display = 'none'
+        @rect.style.display = 'none'
+        @base.style.display = 'none'
         
     clear: -> 
         
         @hide()
-        $('.name',  @div).innerHTML = ''
-        $('.path',  @div).innerHTML = ''
-        $('.size',  @div).innerHTML = ''
+        $('.base.name',     @div).innerHTML = ''
+        $('.active.name',   @div).innerHTML = ''
+        $('.path',          @div).innerHTML = ''
+        $('.base.size',     @div).innerHTML = ''
+        $('.active.size',   @div).innerHTML = ''
     
-    showObject: (obj) ->
+    objPath: (obj) ->
         
-        paths = []
-        p = obj
-        while p = p.parent
-            paths.unshift p.dir ? p.name
-        path = slash.tilde paths.join '/'
+        path = [obj.dir ? obj.name]
+        while obj = obj.parent
+            path.unshift obj.dir ? obj.name
+        slash.tilde path.join '/'
+        
+    showObject: (event) ->
+        
+        obj = event.target.obj
+        return if empty obj
+        
+        br = event.target.getBoundingClientRect()
+
+        space =$ '#space'
+        sr = space.getBoundingClientRect()
+        
+        @rect.style.left   = "#{br.x-sr.x}px"
+        @rect.style.top    = "#{br.y-sr.y}px"
+        @rect.style.width  = "#{br.width}px"
+        @rect.style.height = "#{br.height}px"
+        
+        base = event.target
+        while base.parentNode != space and base.parentNode.parentNode != space
+            base = base.parentNode
             
-        $('.name',  @div).innerText = obj.name 
-        $('.path',  @div).innerText = path
-        $('.size',  @div).innerText = prettybytes obj.size
+        br = base.getBoundingClientRect()
+        @base.style.left   = "#{br.x-sr.x}px"
+        @base.style.top    = "#{br.y-sr.y}px"
+        @base.style.width  = "#{br.width}px"
+        @base.style.height = "#{br.height}px"
+        
+        $('.base.name',     @div).innerText = base.obj.name
+        $('.active.name',   @div).innerText = obj.name
+        $('.path',          @div).innerText = @objPath obj
+        $('.base.size',     @div).innerText = prettybytes base.obj.size
+        $('.active.size',   @div).innerText = prettybytes obj.size
         
     position: (event) ->
         
