@@ -17,13 +17,13 @@ license         Unlicense
 bugs
                 url  https://github.com/monsterkodi/space/issues
 dependencies
-                findit          ^2.0.0
                 findit2         ^2.2.3
                 kxk             https://github.com/monsterkodi/kxk.git
                 performance-now  ^2.1.0
                 pretty-bytes    ^5.1.0
                 pretty-ms       ^3.2.0
 devDependencies
+                konrad          https://github.com/monsterkodi/konrad.git
                 electron        ^2.0.3
                 electron-packager  ^12.1.0
                 electron-rebuild  ^1.7.3
