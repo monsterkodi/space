@@ -1,13 +1,11 @@
-
-#define MyAppName "klog"
-#define MyAppVersion "0.16.0"
+#define MyAppName "space"
+#define MyAppVersion "0.10.0"
 #define MyAppPublisher "monsterkodi"
-#define MyAppURL "https://github.com/monsterkodi/klog"
-#define MyAppExeName "klog.exe"
+#define MyAppURL "https://github.com/monsterkodi/space"
+#define MyAppExeName "space.exe"
 
 [Setup]
-; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{1629C7D0-5067-4EDE-A797-8A693CFBC23B}
+AppId={{EB39EE0D-C327-416D-8205-EADDE694E45B}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -32,7 +30,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-;Source: "..\{#MyAppName}-win32-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\{#MyAppName}-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
