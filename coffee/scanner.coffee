@@ -34,7 +34,7 @@ class Scanner
             @walker.on 'error', ->
                 
         catch err
-            error "Walker.start -- #{err} dir: #{dir} stack:", err.stack
+            error "Scanner.start -- #{err} dir: #{@dir} stack:", err.stack
 
     newDir: (dir) -> 
         
