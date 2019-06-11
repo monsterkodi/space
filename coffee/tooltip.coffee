@@ -6,7 +6,7 @@
    000      0000000    0000000   0000000     000     000  000      
 ###
 
-{ post, slash, empty, elem, pos, log, $, _ } = require 'kxk'
+{ post, slash, empty, elem, kpos, $, _ } = require 'kxk'
 
 prettybytes = require 'pretty-bytes'
 
@@ -115,7 +115,7 @@ class Tooltip
         
     position: (event) ->
         
-        absPos = pos event
+        absPos = kpos event
         
         left = absPos.x
         top  = absPos.y

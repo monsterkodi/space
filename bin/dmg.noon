@@ -1,0 +1,18 @@
+title  ko
+icon   ../img/app.icns
+background  background.png
+window
+    position
+        x   200
+        y   600
+contents
+    .
+        x   100
+        y   180
+        type  link 
+        path  /Applications
+    .
+        x   100
+        y   70
+        type  file 
+        path  ../ko-darwin-x64/ko.app
