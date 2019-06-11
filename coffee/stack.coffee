@@ -6,7 +6,7 @@
 0000000      000     000   000   0000000  000   000
 ###
 
-{ post, elem, childp, empty, slash, fs, log, $, _ } = require 'kxk'
+{ post, elem, childp, empty, slash, os, fs, log, $, _ } = require 'kxk'
 
 render = require './render'
 
@@ -85,7 +85,12 @@ class Stack
     scanDir: (@dir) ->
         
         @cp?.kill()
-        @cp = childp.fork slash.join(__dirname, 'scanner.js'), [@dir], stdio: ['pipe', 'pipe', 'ignore', 'ipc'], execPath: 'node'
+        try
+            @cp = childp.fork slash.join(__dirname, 'scanner.js'), [@dir], stdio: ['pipe', 'pipe', 'ignore', 'ipc'], execPath: 'node'
+        catch err
+            if os.platform() != 'win32'
+                @cp = childp.fork slash.join(__dirname, 'scanner.js'), [@dir], stdio: ['pipe', 'pipe', 'ignore', 'ipc'], execPath: '/usr/local/bin/node'
+        
         @cp.on 'message', @onStatus
     
     onStatus: (status) =>

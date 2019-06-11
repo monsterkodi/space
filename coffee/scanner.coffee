@@ -107,12 +107,9 @@ class Scanner
         @dirs[@dir].dir = @dir
         
         json = JSON.stringify @dirs[@dir], null, 1
-        file = slash.join process.cwd(), 'scan.json'
-        
-        # log "write #{file}"
+        file = slash.join __dirname, '..', 'scan.json'
         
         fs.writeFile file, json, (err) =>
-            log "wrote #{file}"
             if valid err
                 error err 
                 @send error:err.stack
