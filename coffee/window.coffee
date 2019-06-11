@@ -6,8 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00  
 ###
 
-{ post, win, open, prefs, elem, setStyle, getStyle, pos, popup, first,
-  valid, empty, childp, slash, clamp, udp, str, fs, error, log, $, _ } = require 'kxk'
+{ post, win, open, prefs, first, slash, clamp, $, _ } = require 'kxk'
 
 electron = require 'electron'
 Tooltip  = require './tooltip'
