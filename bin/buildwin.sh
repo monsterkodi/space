@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
-cd `dirname $0`/..
+
+DIR=`dirname $0`
+BIN=$DIR/../node_modules/.bin
+cd $DIR/..
+
+npm install
 
 if rm -rf space-win32-x64; then
-    
-    konrad
 
-    node_modules/.bin/electron-rebuild
+    if $BIN/konrad; then
 
-    node_modules/electron-packager/cli.js . --overwrite --icon=img/app.ico
-    
-    rm -rf space-win32-x64/resources/app/inno
+        $BIN/electron-rebuild
 
+        $BIN/electron-packager . --overwrite --icon=img/app.ico
+
+        start space-win32-x64/space.exe
+    fi
 fi

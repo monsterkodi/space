@@ -8,7 +8,7 @@
 
 { valid, log } = require 'kxk'
 
-now = require 'performance-now'
+{ performance } = require 'perf_hooks'
 
 tags = {}
 
