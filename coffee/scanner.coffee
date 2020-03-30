@@ -6,21 +6,15 @@
 0000000    0000000  000   000  000   000  000   000  00000000  000   000
 ###
 
-{ post, slash, walkdir, elem, empty, valid, fs, $, _ } = require 'kxk'
+{ _, empty, fs, slash, valid } = require 'kxk'
 
-log         = console.log
-profile     = require './profile'
 prettybytes = require 'pretty-bytes'
-prettytime  = require 'pretty-ms'
 findit      = require 'findit2'
 
 class Scanner
 
-    constructor: (@dir) ->
+    @: (@dir) ->
         
-        profile.tag 'scan'
-        profile.tag 'dir'
-
         @dirs = {}
         
         @newDir @dir
@@ -28,11 +22,11 @@ class Scanner
         try
             @walker = findit @dir, no_recurse:false, track_inodes:false
                                 
-            @walker.on 'path', @onPath            
-            @walker.on 'end',  @onEnd               
-            @walker.on 'stop', @onEnd               
-            @walker.on 'error', ->
-                
+            @walker.on 'path' @onPath            
+            @walker.on 'end'  @onEnd               
+            @walker.on 'stop' @onEnd               
+            @walker.on 'error' ->
+
         catch err
             error "Scanner.start -- #{err} dir: #{@dir} stack:", err.stack
 
@@ -79,10 +73,7 @@ class Scanner
         else if stat.isFile()
             @addFile p, stat.size, slash.dir(p)
             
-        if profile.delta('dir') > 300
-            
-            profile.tag 'dir'
-            @status()
+        @status()
             
     #  0000000   0000000    0000000         00000000  000  000      00000000  
     # 000   000  000   000  000   000       000       000  000      000       
@@ -107,15 +98,14 @@ class Scanner
         @dirs[@dir].dir = @dir
         
         json = JSON.stringify @dirs[@dir], null, 1
-        file = slash.join __dirname, '..', 'scan.json'
+        file = slash.join __dirname, '..' 'scan.json'
         
         fs.writeFile file, json, (err) =>
             if valid err
                 error err 
                 @send error:err.stack
             else
-                time = prettytime parseInt profile.delta 'scan'
-                @send file:file, time:time, size:json.length
+                @send file:file, done:true, size:json.length
             
         @walker = null
                 
@@ -142,8 +132,8 @@ if not empty process.argv[2]
 else
     dir = process.cwd()
 
-process.on 'uncaughtException', (err) ->
-    log 'scanner error', err.stack
+process.on 'uncaughtException' (err) ->
+    log 'scanner error' err.stack
     true
     
 new Scanner slash.resolve dir

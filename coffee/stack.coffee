@@ -6,13 +6,13 @@
 0000000      000     000   000   0000000  000   000
 ###
 
-{ post, elem, childp, empty, slash, os, fs, log, $, _ } = require 'kxk'
+{ $, childp, elem, empty, fs, kerror, klog, os, post, slash } = require 'kxk'
 
 render = require './render'
 
 class Stack
 
-    constructor: ->
+    @: ->
         
         @dir   = null
         @cp    = null
@@ -45,16 +45,16 @@ class Stack
             
     render: (@obj) -> 
     
-        # post.emit 'tooltip', 'clear'
+        # post.emit 'tooltip' 'clear'
         @path = @objPath @obj
-        log "Stack.render #{@path}"
+        klog "Stack.render #{@path}"
         
         @title?.remove()
-        @title = elem class:'stackobj', text:@path
+        @title = elem class:'stackobj' text:@path
         titlebar =$ '#titlebar'
         titlebar.insertBefore @title, $ '.minimize'
         render @obj, $ '#space'
-        post.emit 'tooltip', 'show'
+        post.emit 'tooltip' 'show'
     
     # 000       0000000    0000000   0000000        00000000  000  000      00000000  
     # 000      000   000  000   000  000   000      000       000  000      000       
@@ -86,29 +86,28 @@ class Stack
         
         @cp?.kill()
         try
-            @cp = childp.fork slash.join(__dirname, 'scanner.js'), [@dir], stdio: ['pipe', 'pipe', 'ignore', 'ipc'], execPath: 'node'
+            @cp = childp.fork slash.join(__dirname, 'scanner.js'), [@dir], stdio: ['pipe' 'pipe' 'ignore' 'ipc'], execPath: 'node'
         catch err
             if os.platform() != 'win32'
-                @cp = childp.fork slash.join(__dirname, 'scanner.js'), [@dir], stdio: ['pipe', 'pipe', 'ignore', 'ipc'], execPath: '/usr/local/bin/node'
+                @cp = childp.fork slash.join(__dirname, 'scanner.js'), [@dir], stdio: ['pipe' 'pipe' 'ignore' 'ipc'], execPath: '/usr/local/bin/node'
+            else
+                kerror err
         
-        @cp.on 'message', @onStatus
+        @cp.on 'message' @onStatus
     
     onStatus: (status) =>
             
-        # log 'status', status
-        if status.time
-            div =$ '.status'
-            div.appendChild elem class:'time', text:status.time
+        if status.done
             @loadFile status.file, status
         else
-            post.emit 'tooltip', 'clear'
+            post.emit 'tooltip' 'clear'
             space =$ '#space'
             space.innerHTML = ''
-            space.appendChild elem class:'status', children: [
-                elem class:'dir',   text: @dir
-                elem class:'files', text: "#{status.files} files"
-                elem class:'dirs',  text: "#{status.dirs} folders"
-                elem class:'size',  text: status.short
+            space.appendChild elem class:'status' children: [
+                elem class:'dir'   text: @dir
+                elem class:'files' text: "#{status.files} files"
+                elem class:'dirs'  text: "#{status.dirs} folders"
+                elem class:'size'  text: status.short
             ]
             
 module.exports = Stack

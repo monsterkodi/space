@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00  
 ###
 
-{ post, win, open, prefs, first, slash, clamp, $, _ } = require 'kxk'
+{ $, _, clamp, klog, open, post, prefs, slash, tooltip, valid, win } = require 'kxk'
 
 electron = require 'electron'
 Tooltip  = require './tooltip'
@@ -37,11 +37,12 @@ openDir = ->
         title:      'Open'
         properties: ['openDirectory']
 
-    electron.remote.dialog.showOpenDialog opts, (dirs) ->
-        if dir = first dirs
+    electron.remote.dialog.showOpenDialog(opts).then (result) =>
+        if not result.cancelled and valid result.filePaths
+            # klog 'openDir' result.filePaths[0]
             space.innerHTML = ''
             tooltip.hide()
-            stack.scanDir slash.path dir
+            stack.scanDir slash.path result.filePaths[0]
             
 # 00000000  000   000  00000000   000       0000000   00000000   00000000  
 # 000        000 000   000   000  000      000   000  000   000  000       
@@ -51,7 +52,7 @@ openDir = ->
 
 explore     = -> open slash.unslash slash.untilde tooltip.objPath tooltip.obj
 exploreRoot = -> 
-    log 'exploreRoot', slash.unslash slash.untilde tooltip.objPath stack.obj
+    log 'exploreRoot' slash.unslash slash.untilde tooltip.objPath stack.obj
     open slash.unslash slash.untilde tooltip.objPath stack.obj
             
 #  0000000   0000000   00     00  0000000     0000000   
@@ -66,7 +67,7 @@ post.on 'combo', (combo, info) ->
         when 'r'   then exploreRoot()
         when 'e'   then explore()
         when 'esc' then stack.goUp()
-        else log 'combo', combo
+        else log 'combo' combo
 
 #  0000000   0000000   000   000  000000000  00000000  000   000  000000000  
 # 000       000   000  0000  000     000     000        000 000      000     
@@ -76,18 +77,18 @@ post.on 'combo', (combo, info) ->
     
 onContext = (items) ->
     [    
-         text:'Up',   accel:'esc'
+         text:'Up'   accel:'esc'
     ,
          text: ''
     ,
-         text:'Explore', accel:'e'
+         text:'Explore' accel:'e'
     ,
-         text:'Explore Root', accel:'r'
+         text:'Explore Root' accel:'r'
     ,
          text: ''
     ].concat items
     
-post.on 'popup', (msg) -> 
+post.on 'popup' (msg) -> 
     
     switch msg 
         when 'opened' then tooltip.hide()
@@ -161,7 +162,7 @@ onMouseDown = (event) ->
             if obj = event.target.obj
                 stack.goDown obj
         when 1
-            post.emit 'menuAction', 'Up'
+            post.emit 'menuAction' 'Up'
             
     onMouseEnter event
             
@@ -171,11 +172,11 @@ window.onload = ->
     
     tooltip = new Tooltip()
     
-    scanFile = slash.join __dirname, '..', 'scan.json'
+    scanFile = slash.join __dirname, '..' 'scan.json'
     if slash.isFile scanFile
         stack.loadFile scanFile
         
-    main.addEventListener 'mouseover', onMouseEnter
-    main.addEventListener 'mousemove', onMouseMove
-    main.addEventListener 'mouseup', onMouseDown
+    main.addEventListener 'mouseover' onMouseEnter
+    main.addEventListener 'mousemove' onMouseMove
+    main.addEventListener 'mouseup'   onMouseDown
         
