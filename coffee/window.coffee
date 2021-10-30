@@ -6,7 +6,7 @@
 00     00  000  000   000  0000000     0000000   00     00  
 ###
 
-{ $, _, clamp, klog, open, post, prefs, slash, tooltip, valid, win } = require 'kxk'
+{ $, _, clamp, open, post, prefs, slash, tooltip, win } = require 'kxk'
 
 electron = require 'electron'
 Tooltip  = require './tooltip'
@@ -33,16 +33,15 @@ tooltip = null
 
 openDir = ->
 
-    opts =
+    window.win.openFileDialog(
         title:      'Open'
+        defaultPath: '~'
         properties: ['openDirectory']
-
-    electron.remote.dialog.showOpenDialog(opts).then (result) =>
-        if not result.cancelled and valid result.filePaths
-            # klog 'openDir' result.filePaths[0]
+        cb: (files) =>
             space.innerHTML = ''
             tooltip.hide()
-            stack.scanDir slash.path result.filePaths[0]
+            stack.scanDir slash.path files[0]
+        )
             
 # 00000000  000   000  00000000   000       0000000   00000000   00000000  
 # 000        000 000   000   000  000      000   000  000   000  000       
@@ -61,7 +60,7 @@ exploreRoot = ->
 # 000       000   000  000 0 000  000   000  000   000  
 #  0000000   0000000   000   000  0000000     0000000   
 
-post.on 'combo', (combo, info) -> 
+post.on 'combo' (combo, info) -> 
 
     switch combo
         when 'r'   then exploreRoot()
