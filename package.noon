@@ -21,11 +21,11 @@ author          monsterkodi
 license         Unlicense
 dependencies
                 findit2       ^2.2.3
-                kxk           ^0.419.0
+                kxk           ^0.422.0
                 pretty-bytes  ^5.6.0
                 pretty-ms     ^7.0.1
 devDependencies
-                electron        ^15.3.0
+                electron        ^15.3.1
                 electron-builder  ^22.13.1
-                konrad          ^0.191.0
+                konrad          ^0.192.0
                 sds             ^4.4.0
